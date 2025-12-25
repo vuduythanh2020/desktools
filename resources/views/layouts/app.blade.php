@@ -368,10 +368,6 @@
             flex-direction: column;
             gap: 16px;
             align-items: center;
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding-bottom: 12px;
         }
         .preview-fullscreen.lucky-preview #ld-preview-results .panel {
             width: 90%;
