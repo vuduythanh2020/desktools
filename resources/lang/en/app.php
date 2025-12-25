@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'site_name' => 'Tool Nest',
-    'site_tagline' => 'Small tools, fast results, less friction.',
-    'site_description' => 'Compact tools for developers and data workflows.',
+    'site_name' => 'Desktools',
+    'site_tagline' => 'Desk-ready tools for fast text and data cleanup.',
+    'site_description' => 'Desktools packs small, focused utilities for daily text and data work.',
     'nav' => [
         'home' => 'Home',
         'text_unescape' => 'Text Unescape',
@@ -33,6 +33,7 @@ return [
         'summary' => 'Unescape strings from logs, clipboards, and requests.',
         'heading' => 'Text Unescape Toolkit',
         'description' => 'Paste escaped text, pick a mode, and get a clean output.',
+        'panel_import' => 'Import file',
         'panel_mode' => 'Processing mode',
         'panel_actions' => 'Quick actions',
         'panel_tips' => 'Hints',
@@ -47,6 +48,10 @@ return [
         'output' => 'Output',
         'placeholder' => 'Paste JSON, HTML, URL, Base64, or CSV here...',
         'tips' => 'Tip: For escaped JSON logs, use Auto or JSON for readable output.',
+        'file_button' => 'Load file',
+        'file_hint' => 'No file',
+        'file_error_read' => 'Failed to read file.',
+        'file_error_xlsx' => 'XLSX parser is not available.',
         'modes' => [
             'auto' => 'Auto detect',
             'json' => 'JSON unescape',

@@ -3,8 +3,71 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', __('app.site_name'))</title>
-    <meta name="description" content="@yield('description', __('app.site_description'))">
+    @php
+        $locale = $locale ?? app()->getLocale();
+        $siteName = __('app.site_name');
+        $siteDescription = __('app.site_description');
+        $pageTitle = trim(View::yieldContent('title', $siteName));
+        $pageDescription = trim(View::yieldContent('description', $siteDescription));
+        $canonical = url()->current();
+        $locales = ['vi', 'en'];
+        $localeToOg = ['vi' => 'vi_VN', 'en' => 'en_US'];
+        $segments = request()->segments();
+    @endphp
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+    <link rel="canonical" href="{{ $canonical }}">
+    @foreach ($locales as $altLocale)
+        @php
+            $altSegments = $segments;
+            if (count($altSegments) > 0 && in_array($altSegments[0], $locales, true)) {
+                $altSegments[0] = $altLocale;
+            } else {
+                array_unshift($altSegments, $altLocale);
+            }
+            $altUrl = url(implode('/', $altSegments));
+        @endphp
+        <link rel="alternate" hreflang="{{ $altLocale }}" href="{{ $altUrl }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ url('/vi') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $siteName }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:url" content="{{ $canonical }}">
+    <meta property="og:locale" content="{{ $localeToOg[$locale] ?? 'vi_VN' }}">
+    @foreach ($locales as $altLocale)
+        @if ($altLocale !== $locale)
+            <meta property="og:locale:alternate" content="{{ $localeToOg[$altLocale] ?? 'en_US' }}">
+        @endif
+    @endforeach
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => $siteName,
+            'url' => url('/'),
+            'inLanguage' => $locale,
+        ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+            'name' => $pageTitle,
+            'description' => $pageDescription,
+            'url' => $canonical,
+            'inLanguage' => $locale,
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => $siteName,
+                'url' => url('/'),
+            ],
+        ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -169,6 +232,20 @@
             border: 1px solid rgba(232, 216, 200, 0.7);
             background: rgba(255, 255, 255, 0.85);
         }
+        .file-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: #fff3e7;
+            color: var(--muted);
+        }
+        .file-pill.active {
+            color: var(--primary-dark);
+        }
         .toolbar .group label {
             font-size: 12px;
             text-transform: uppercase;
@@ -325,7 +402,7 @@
             width: 44px;
             height: 44px;
             border-radius: 14px;
-            background: linear-gradient(140deg, #e49a64, #d15a35);
+            background: url("/favicon.svg") center/cover no-repeat;
             box-shadow: 0 10px 20px rgba(209, 90, 53, 0.2);
         }
         .brand h1 {

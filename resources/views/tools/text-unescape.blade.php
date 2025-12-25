@@ -23,6 +23,12 @@
                 </select>
             </div>
             <div class="group">
+                <label>{{ __('app.text_unescape.panel_import') }}</label>
+                <label for="tu-file" class="btn secondary">{{ __('app.text_unescape.file_button') }}</label>
+                <span id="tu-file-name" class="file-pill">{{ __('app.text_unescape.file_hint') }}</span>
+                <input id="tu-file" type="file" accept=".csv,.xlsx,.xls,.json,.txt" style="display:none;">
+            </div>
+            <div class="group">
                 <label>{{ __('app.text_unescape.panel_actions') }}</label>
                 <button id="tu-run" class="btn">{{ __('app.actions.convert') }}</button>
                 <button id="tu-swap" class="btn secondary">{{ __('app.actions.swap') }}</button>
@@ -65,13 +71,18 @@
 @endsection
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
+        const fileErrorRead = `{{ __('app.text_unescape.file_error_read') }}`;
+        const fileErrorXlsx = `{{ __('app.text_unescape.file_error_xlsx') }}`;
         const input = document.getElementById('tu-input');
         const output = document.getElementById('tu-output');
         const textView = document.getElementById('tu-text');
         const tree = document.getElementById('tu-tree');
         const pathBar = document.getElementById('tu-path');
         const mode = document.getElementById('tu-mode');
+        const fileInput = document.getElementById('tu-file');
+        const fileName = document.getElementById('tu-file-name');
         const run = document.getElementById('tu-run');
         const swap = document.getElementById('tu-swap');
         const copy = document.getElementById('tu-copy');
@@ -237,6 +248,66 @@
             return text.replace(/""/g, '"');
         }
 
+        function parseCsv(raw) {
+            const rows = [];
+            let row = [];
+            let cell = '';
+            let inQuotes = false;
+            for (let i = 0; i < raw.length; i++) {
+                const char = raw[i];
+                if (inQuotes) {
+                    if (char === '"' && raw[i + 1] === '"') {
+                        cell += '"';
+                        i++;
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else {
+                        cell += char;
+                    }
+                    continue;
+                }
+                if (char === '"') {
+                    inQuotes = true;
+                } else if (char === ',') {
+                    row.push(cell);
+                    cell = '';
+                } else if (char === '\n') {
+                    row.push(cell);
+                    rows.push(row);
+                    row = [];
+                    cell = '';
+                } else if (char === '\r') {
+                    if (raw[i + 1] === '\n') {
+                        continue;
+                    }
+                    row.push(cell);
+                    rows.push(row);
+                    row = [];
+                    cell = '';
+                } else {
+                    cell += char;
+                }
+            }
+            if (cell.length || row.length) {
+                row.push(cell);
+                rows.push(row);
+            }
+            return rows.filter((rowData) => rowData.some((value) => value !== ''));
+        }
+
+        function csvToJson(raw) {
+            const rows = parseCsv(raw);
+            if (!rows.length) return [];
+            const headers = rows.shift().map((header, index) => header.trim() || `col_${index + 1}`);
+            return rows.map((row) => {
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index] ?? '';
+                });
+                return obj;
+            });
+        }
+
         function autoDetect(raw) {
             const trimmed = raw.trim();
             if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
@@ -265,6 +336,16 @@
             pathBar.style.display = view === 'tree' ? 'block' : 'none';
             tree.style.display = view === 'tree' ? 'block' : 'none';
             textView.style.display = view === 'text' ? 'block' : 'none';
+        }
+
+        function setFileLabel(name) {
+            if (!name) {
+                fileName.textContent = `{{ __('app.text_unescape.file_hint') }}`;
+                fileName.classList.remove('active');
+                return;
+            }
+            fileName.textContent = name;
+            fileName.classList.add('active');
         }
 
         function formatValue(value) {
@@ -488,6 +569,26 @@
             }
         }
 
+        async function readFile(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext === 'xlsx' || ext === 'xls') {
+                if (typeof XLSX === 'undefined') {
+                    textView.textContent = fileErrorXlsx;
+                    return null;
+                }
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                return XLSX.utils.sheet_to_json(sheet, { defval: '' });
+            }
+            if (ext === 'csv') {
+                const text = await file.text();
+                return csvToJson(text);
+            }
+            return file.text();
+        }
+
         run.addEventListener('click', () => {
             runTransform();
         });
@@ -502,6 +603,31 @@
             const temp = input.value;
             input.value = output.value;
             output.value = temp;
+        });
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                setFileLabel('');
+                return;
+            }
+            setFileLabel(file.name);
+            const ext = file.name.split('.').pop().toLowerCase();
+            try {
+                const result = await readFile(file);
+                if (result === null) return;
+                if (ext === 'csv' || ext === 'xlsx' || ext === 'xls') {
+                    input.value = JSON.stringify(result, null, 2);
+                    mode.value = 'json';
+                } else {
+                    input.value = result;
+                }
+                runTransform();
+                fileInput.value = '';
+            } catch {
+                input.value = '';
+                textView.textContent = fileErrorRead;
+            }
         });
 
         copy.addEventListener('click', async () => {

@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'site_name' => 'Tool Nest',
-    'site_tagline' => 'Công cụ nhỏ, dùng nhanh, tiết kiệm thời gian.',
-    'site_description' => 'Bộ công cụ nhỏ dành cho lập trình viên và người làm việc với dữ liệu.',
+    'site_name' => 'Desktools',
+    'site_tagline' => 'Bộ công cụ bàn làm việc cho xử lý text và dữ liệu nhanh.',
+    'site_description' => 'Desktools mang các tiện ích nhỏ, tập trung cho công việc text và dữ liệu hằng ngày.',
     'nav' => [
         'home' => 'Trang chủ',
         'text_unescape' => 'Text Unescape',
@@ -33,6 +33,7 @@ return [
         'summary' => 'Giải mã chuỗi bị escape từ log, clipboard, request.',
         'heading' => 'Text Unescape Toolkit',
         'description' => 'Dán chuỗi bị escape vào, chọn chế độ và nhận kết quả ngay.',
+        'panel_import' => 'Nhập từ file',
         'panel_mode' => 'Chế độ xử lý',
         'panel_actions' => 'Hành động nhanh',
         'panel_tips' => 'Gợi ý',
@@ -47,6 +48,10 @@ return [
         'output' => 'Kết quả',
         'placeholder' => 'Dán JSON, HTML, URL, Base64 hoặc CSV vào đây...',
         'tips' => 'Mẹo: Nếu đang log JSON bị escape, chọn Auto hoặc JSON để xem dạng dễ đọc.',
+        'file_button' => 'Chọn file',
+        'file_hint' => 'Chưa có file',
+        'file_error_read' => 'Không đọc được file.',
+        'file_error_xlsx' => 'Không có trình đọc XLSX.',
         'modes' => [
             'auto' => 'Auto detect',
             'json' => 'JSON unescape',
