@@ -2,6 +2,35 @@
 
 @section('title', __('app.home.title'))
 @section('description', __('app.home.description'))
+@section('structured_data')
+    @php
+        $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+        if (str_starts_with($baseUrl, 'http://')) {
+            $baseUrl = 'https://' . substr($baseUrl, 7);
+        }
+    @endphp
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'name' => __('app.site_name') . ' tools',
+            'itemListElement' => [
+                [
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => __('app.text_unescape.title'),
+                    'url' => $baseUrl . '/' . $locale . '/text-unescape',
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => __('app.csv_cleaner.title'),
+                    'url' => $baseUrl . '/' . $locale . '/csv-cleaner',
+                ],
+            ],
+        ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
+@endsection
 
 @section('content')
     <div class="card">

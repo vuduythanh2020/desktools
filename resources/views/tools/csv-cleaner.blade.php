@@ -3,6 +3,31 @@
 @section('title', __('app.csv_cleaner.page_title'))
 @section('description', __('app.csv_cleaner.description'))
 @section('shell_class', 'wide focus')
+@section('structured_data')
+    @php
+        $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+        if (str_starts_with($baseUrl, 'http://')) {
+            $baseUrl = 'https://' . substr($baseUrl, 7);
+        }
+        $pageUrl = $baseUrl . '/' . $locale . '/csv-cleaner';
+    @endphp
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebApplication',
+            'name' => __('app.csv_cleaner.title'),
+            'description' => __('app.csv_cleaner.description'),
+            'applicationCategory' => 'DeveloperApplication',
+            'operatingSystem' => 'All',
+            'url' => $pageUrl,
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => '0',
+                'priceCurrency' => 'USD',
+            ],
+        ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
+@endsection
 
 @section('content')
     <div class="focus-nav">

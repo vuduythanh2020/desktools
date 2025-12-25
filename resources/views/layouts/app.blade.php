@@ -8,8 +8,16 @@
         $siteName = __('app.site_name');
         $siteDescription = __('app.site_description');
         $pageTitle = trim(View::yieldContent('title', $siteName));
+        if ($pageTitle && stripos($pageTitle, $siteName) === false) {
+            $pageTitle .= ' | ' . $siteName;
+        }
         $pageDescription = trim(View::yieldContent('description', $siteDescription));
-        $canonical = url()->current();
+        $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+        if (str_starts_with($baseUrl, 'http://')) {
+            $baseUrl = 'https://' . substr($baseUrl, 7);
+        }
+        $path = trim(request()->path(), '/');
+        $canonical = $baseUrl . ($path === '' ? '' : '/' . $path);
         $locales = ['vi', 'en'];
         $localeToOg = ['vi' => 'vi_VN', 'en' => 'en_US'];
         $segments = request()->segments();
@@ -26,30 +34,37 @@
             } else {
                 array_unshift($altSegments, $altLocale);
             }
-            $altUrl = url(implode('/', $altSegments));
+            $altPath = implode('/', $altSegments);
+            $altUrl = $baseUrl . ($altPath === '' ? '' : '/' . $altPath);
         @endphp
         <link rel="alternate" hreflang="{{ $altLocale }}" href="{{ $altUrl }}">
     @endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ url('/vi') }}">
+    <link rel="alternate" hreflang="x-default" href="{{ $baseUrl }}/vi">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ $siteName }}">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ $canonical }}">
     <meta property="og:locale" content="{{ $localeToOg[$locale] ?? 'vi_VN' }}">
+    <meta property="og:image" content="{{ $baseUrl }}/og-image.svg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ $siteName }}">
     @foreach ($locales as $altLocale)
         @if ($altLocale !== $locale)
             <meta property="og:locale:alternate" content="{{ $localeToOg[$altLocale] ?? 'en_US' }}">
         @endif
     @endforeach
     <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="{{ $baseUrl }}/og-image.svg">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#d15a35">
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',
             'name' => $siteName,
-            'url' => url('/'),
+            'url' => $baseUrl . '/',
             'inLanguage' => $locale,
         ], JSON_UNESCAPED_SLASHES) !!}
     </script>
@@ -64,10 +79,11 @@
             'isPartOf' => [
                 '@type' => 'WebSite',
                 'name' => $siteName,
-                'url' => url('/'),
+                'url' => $baseUrl . '/',
             ],
         ], JSON_UNESCAPED_SLASHES) !!}
     </script>
+    @yield('structured_data')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -92,6 +108,22 @@
                 radial-gradient(1200px 600px at 10% -10%, var(--bg-accent), transparent 60%),
                 radial-gradient(900px 500px at 90% 10%, #f1eadf, transparent 55%),
                 var(--bg);
+        }
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 8px;
+            z-index: 999;
+            background: #fff;
+            color: var(--ink);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .skip-link:focus {
+            left: 12px;
         }
         .shell {
             max-width: 1560px;
@@ -443,8 +475,8 @@
         }
         .lang a.active {
             color: #fff;
-            background: var(--primary);
-            border-color: var(--primary);
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
         }
         .card {
             background: var(--card);
@@ -452,6 +484,13 @@
             border-radius: 20px;
             padding: 32px;
             box-shadow: 0 12px 30px rgba(31, 26, 23, 0.06);
+        }
+        .site-footer {
+            margin-top: 24px;
+            padding: 12px 0 4px;
+            color: var(--muted);
+            font-size: 12px;
+            text-align: center;
         }
         .tool-card {
             padding: 36px;
@@ -471,7 +510,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background: var(--primary);
+            background: var(--primary-dark);
             color: #fff;
             padding: 10px 16px;
             border-radius: 10px;
@@ -565,8 +604,9 @@
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <div class="shell @yield('shell_class')">
-        <header>
+        <header role="banner">
             <div class="brand">
                 <div class="logo" aria-hidden="true"></div>
                 <div>
@@ -574,7 +614,7 @@
                     <p>{{ __('app.site_tagline') }}</p>
                 </div>
             </div>
-            <nav class="nav">
+            <nav class="nav" aria-label="Primary">
                 <a href="/{{ $locale }}">{{ __('app.nav.home') }}</a>
                 <a href="/{{ $locale }}/text-unescape">{{ __('app.nav.text_unescape') }}</a>
                 <a href="/{{ $locale }}/csv-cleaner">{{ __('app.nav.csv_cleaner') }}</a>
@@ -592,7 +632,12 @@
                 <a href="/{{ $enPath }}" class="{{ $locale === 'en' ? 'active' : '' }}">EN</a>
             </div>
         </header>
-        @yield('content')
+        <main id="main-content" role="main">
+            @yield('content')
+        </main>
+        <footer class="site-footer" role="contentinfo">
+            <span>Desktools</span>
+        </footer>
     </div>
     @yield('scripts')
 </body>

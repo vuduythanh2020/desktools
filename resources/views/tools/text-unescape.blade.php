@@ -3,6 +3,31 @@
 @section('title', __('app.text_unescape.page_title'))
 @section('description', __('app.text_unescape.description'))
 @section('shell_class', 'wide focus')
+@section('structured_data')
+    @php
+        $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+        if (str_starts_with($baseUrl, 'http://')) {
+            $baseUrl = 'https://' . substr($baseUrl, 7);
+        }
+        $pageUrl = $baseUrl . '/' . $locale . '/text-unescape';
+    @endphp
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebApplication',
+            'name' => __('app.text_unescape.title'),
+            'description' => __('app.text_unescape.description'),
+            'applicationCategory' => 'DeveloperApplication',
+            'operatingSystem' => 'All',
+            'url' => $pageUrl,
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => '0',
+                'priceCurrency' => 'USD',
+            ],
+        ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
+@endsection
 
 @section('content')
     <div class="focus-nav">

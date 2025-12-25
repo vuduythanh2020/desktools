@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="160" y1="40" x2="1040" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f2dfc8"/>
+      <stop offset="1" stop-color="#d15a35"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="240" y1="140" x2="980" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff7ef"/>
+      <stop offset="1" stop-color="#f7e6d2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="48" fill="#f6efe6"/>
+  <rect x="80" y="70" width="1040" height="490" rx="48" fill="url(#g)"/>
+  <rect x="140" y="120" width="920" height="390" rx="40" fill="url(#g2)" stroke="#e8d8c8" stroke-width="2"/>
+  <rect x="210" y="180" width="120" height="120" rx="28" fill="#d15a35"/>
+  <path d="M238 208h52c20.987 0 38 17.013 38 38s-17.013 38-38 38h-52z" fill="#fff7ef"/>
+  <path d="M238 208h26c14.359 0 26 11.641 26 26s-11.641 26-26 26h-26z" fill="#1f1a17" opacity="0.15"/>
+  <text x="370" y="260" font-family="DM Sans, system-ui, -apple-system, sans-serif" font-size="54" font-weight="700" fill="#1f1a17">Desktools</text>
+  <text x="370" y="320" font-family="DM Sans, system-ui, -apple-system, sans-serif" font-size="28" font-weight="500" fill="#6a5d54">Fast text + data tools for daily work</text>
+  <rect x="370" y="360" width="370" height="6" rx="3" fill="#d15a35"/>
+  <text x="370" y="410" font-family="DM Mono, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#8b3a1e">text-unescape · csv-cleaner</text>
+</svg>

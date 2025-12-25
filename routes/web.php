@@ -13,7 +13,11 @@ Route::get('/robots.txt', function () {
     return Response::make(implode("\n", $lines), 200, [
         'Content-Type' => 'text/plain; charset=UTF-8',
     ]);
-});
+})->withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+]);
 
 Route::get('/sitemap.xml', function () {
     $locales = ['vi', 'en'];
@@ -46,10 +50,14 @@ Route::get('/sitemap.xml', function () {
     return Response::make(implode("\n", $xml), 200, [
         'Content-Type' => 'application/xml; charset=UTF-8',
     ]);
-});
+})->withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+]);
 
 Route::get('/', function () {
-    return redirect('/vi');
+    return redirect('/vi', 301);
 });
 
 Route::prefix('{locale}')
