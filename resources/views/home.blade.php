@@ -27,6 +27,12 @@
                     'name' => __('app.csv_cleaner.title'),
                     'url' => $baseUrl . '/' . $locale . '/csv-cleaner',
                 ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 3,
+                    'name' => __('app.lucky_draw.title'),
+                    'url' => $baseUrl . '/' . $locale . '/lucky-draw',
+                ],
             ],
         ], JSON_UNESCAPED_SLASHES) !!}
     </script>
@@ -46,6 +52,11 @@
                 <h3>{{ __('app.csv_cleaner.title') }}</h3>
                 <p class="muted">{{ __('app.csv_cleaner.summary') }}</p>
                 <a class="btn" href="/{{ $locale }}/csv-cleaner">{{ __('app.actions.open_tool') }}</a>
+            </div>
+            <div class="card">
+                <h3>{{ __('app.lucky_draw.title') }}</h3>
+                <p class="muted">{{ __('app.lucky_draw.summary') }}</p>
+                <a class="btn" href="/{{ $locale }}/lucky-draw">{{ __('app.actions.open_tool') }}</a>
             </div>
         </div>
     </div>

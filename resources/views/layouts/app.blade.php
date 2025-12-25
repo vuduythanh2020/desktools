@@ -264,6 +264,29 @@
             border: 1px solid rgba(232, 216, 200, 0.7);
             background: rgba(255, 255, 255, 0.85);
         }
+        .method-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .method-tabs .btn {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--border);
+        }
+        .method-tabs .btn.active {
+            background: var(--primary-dark);
+            color: #fff;
+            border-color: var(--primary-dark);
+        }
+        .method-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
         .file-pill {
             display: inline-flex;
             align-items: center;
@@ -324,6 +347,52 @@
             display: none;
             flex-direction: column;
             gap: 12px;
+        }
+        .preview-fullscreen.lucky-preview {
+            inset: 5vh 5vw;
+            text-align: center;
+            pointer-events: auto;
+        }
+        .preview-fullscreen.lucky-preview .toolbar {
+            justify-content: center;
+            gap: 16px;
+        }
+        .preview-fullscreen.lucky-preview .toolbar strong {
+            font-size: 42px;
+        }
+        .preview-fullscreen.lucky-preview .muted {
+            font-size: 28px;
+        }
+        .preview-fullscreen.lucky-preview #ld-preview-results {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-bottom: 12px;
+        }
+        .preview-fullscreen.lucky-preview #ld-preview-results .panel {
+            width: 90%;
+        }
+        .preview-fullscreen.lucky-preview #ld-preview-results .panel > div {
+            justify-content: center;
+        }
+        .preview-fullscreen.lucky-preview .panel {
+            background: #fff7ef;
+            border: 1px solid rgba(232, 216, 200, 0.9);
+        }
+        .preview-fullscreen.lucky-preview strong {
+            font-size: 34px;
+        }
+        .preview-fullscreen.lucky-preview .file-pill {
+            font-size: 34px;
+            padding: 18px 26px;
+            cursor: pointer;
+        }
+        .preview-fullscreen.lucky-preview .file-pill.active {
+            cursor: default;
         }
         .preview-fullscreen.active { display: flex; }
         .preview-fullscreen .table-wrap {
@@ -618,6 +687,7 @@
                 <a href="/{{ $locale }}">{{ __('app.nav.home') }}</a>
                 <a href="/{{ $locale }}/text-unescape">{{ __('app.nav.text_unescape') }}</a>
                 <a href="/{{ $locale }}/csv-cleaner">{{ __('app.nav.csv_cleaner') }}</a>
+                <a href="/{{ $locale }}/lucky-draw">{{ __('app.nav.lucky_draw') }}</a>
             </nav>
             <div class="lang">
                 @php

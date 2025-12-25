@@ -21,7 +21,7 @@ Route::get('/robots.txt', function () {
 
 Route::get('/sitemap.xml', function () {
     $locales = ['vi', 'en'];
-    $paths = ['', 'text-unescape', 'csv-cleaner'];
+    $paths = ['', 'text-unescape', 'csv-cleaner', 'lucky-draw'];
     $urls = [];
     $base = rtrim(config('app.url') ?: url('/'), '/');
     if (str_starts_with($base, 'http://')) {
@@ -81,4 +81,10 @@ Route::prefix('{locale}')
                 'locale' => app()->getLocale(),
             ]);
         })->name('csv-cleaner');
+
+        Route::get('/lucky-draw', function () {
+            return view('tools.lucky-draw', [
+                'locale' => app()->getLocale(),
+            ]);
+        })->name('lucky-draw');
     });
