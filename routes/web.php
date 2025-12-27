@@ -57,7 +57,7 @@ Route::get('/sitemap.xml', function () {
 ]);
 
 Route::get('/', function () {
-    return redirect('/vi', 301);
+    return redirect('/en', 301);
 });
 
 Route::prefix('{locale}')

@@ -13,7 +13,7 @@ class SetLocale
     {
         $locale = $request->route('locale');
         if (!in_array($locale, ['vi', 'en'], true)) {
-            $locale = 'vi';
+            $locale = 'en';
         }
 
         App::setLocale($locale);
