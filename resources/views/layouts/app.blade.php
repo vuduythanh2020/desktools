@@ -474,6 +474,12 @@
             color: var(--muted);
             margin-left: 6px;
         }
+        .tree .node-button.active {
+            background: #fff1e6;
+            border-radius: 6px;
+            padding: 2px 4px;
+            box-shadow: inset 0 0 0 1px rgba(209, 90, 53, 0.18);
+        }
         .path-bar {
             margin: 10px 0;
             padding: 8px 12px;
@@ -482,6 +488,64 @@
             background: rgba(255, 255, 255, 0.9);
             font-size: 13px;
             font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .path-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .path-label {
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .path-crumbs {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+        }
+        .path-crumb {
+            border: 1px solid rgba(232, 216, 200, 0.9);
+            background: #fff;
+            border-radius: 8px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font: inherit;
+            color: var(--primary-dark);
+        }
+        .path-crumb.active {
+            background: #fff1e6;
+            border-color: rgba(209, 90, 53, 0.25);
+            color: var(--primary);
+        }
+        .path-sep {
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .path-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .path-action {
+            border: 1px solid rgba(232, 216, 200, 0.9);
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--ink);
+        }
+        .path-action.pulse {
+            background: rgba(209, 90, 53, 0.14);
+            border-color: rgba(209, 90, 53, 0.35);
+            color: var(--primary-dark);
         }
         header {
             display: flex;

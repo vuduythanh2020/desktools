@@ -115,9 +115,207 @@
         const viewTree = document.getElementById('tu-view-tree');
         const expandBtn = document.getElementById('tu-expand');
         const collapseBtn = document.getElementById('tu-collapse');
+        const copyLabel = `{{ __('app.actions.copy') }}`;
+        const copiedLabel = `{{ __('app.actions.copied') }}`;
         let currentObject = null;
         let currentView = 'text';
         let currentJsonText = '';
+        let currentPath = 'root';
+        let currentPathValue = null;
+        let activeNodeButton = null;
+        let pathNodeMap = new Map();
+        let pathCopyButton = null;
+        let pathCopyTimer = null;
+
+        function parsePathTokens(path) {
+            if (!path || path === 'root') return [];
+            const tokens = [];
+            let buffer = '';
+            for (let i = 0; i < path.length; i++) {
+                const char = path[i];
+                if (char === '.') {
+                    if (buffer) {
+                        tokens.push({ type: 'key', value: buffer });
+                        buffer = '';
+                    }
+                    continue;
+                }
+                if (char === '[') {
+                    if (buffer) {
+                        tokens.push({ type: 'key', value: buffer });
+                        buffer = '';
+                    }
+                    const end = path.indexOf(']', i);
+                    if (end !== -1) {
+                        tokens.push({ type: 'index', value: path.slice(i + 1, end) });
+                        i = end;
+                        continue;
+                    }
+                }
+                buffer += char;
+            }
+            if (buffer) tokens.push({ type: 'key', value: buffer });
+            return tokens;
+        }
+
+        function getNodeByPath(path) {
+            if (!currentObject) return null;
+            if (!path || path === 'root') return currentObject;
+            const tokens = parsePathTokens(path);
+            let node = currentObject;
+            for (const token of tokens) {
+                if (node === null || node === undefined) return null;
+                if (token.type === 'index') {
+                    node = node[Number(token.value)];
+                } else {
+                    node = node[token.value];
+                }
+            }
+            return node;
+        }
+
+        function buildPathCrumbs(path) {
+            const crumbs = [{ label: 'root', path: 'root' }];
+            if (!path || path === 'root') return crumbs;
+            const tokens = parsePathTokens(path);
+            let running = '';
+            for (const token of tokens) {
+                if (token.type === 'index') {
+                    running += `[${token.value}]`;
+                    crumbs.push({ label: `[${token.value}]`, path: running });
+                } else {
+                    running = running ? `${running}.${token.value}` : token.value;
+                    crumbs.push({ label: token.value, path: running });
+                }
+            }
+            return crumbs;
+        }
+
+        function highlightTreeNode(path) {
+            if (activeNodeButton) {
+                activeNodeButton.classList.remove('active');
+            }
+            const next = pathNodeMap.get(path);
+            if (next) {
+                next.classList.add('active');
+                activeNodeButton = next;
+            } else {
+                activeNodeButton = null;
+            }
+        }
+
+        function expandAncestors(li) {
+            let current = li;
+            while (current) {
+                current.classList.remove('collapsed');
+                const caret = current.querySelector(':scope > div .caret');
+                if (caret && caret.textContent !== '·') {
+                    caret.textContent = '▾';
+                }
+                current = current.parentElement?.closest('li') ?? null;
+            }
+        }
+
+        function focusPath(path) {
+            const normalized = path || 'root';
+            setPath(normalized);
+            const target = pathNodeMap.get(normalized);
+            if (target) {
+                const li = target.closest('li');
+                if (li) expandAncestors(li);
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.focus({ preventScroll: true });
+            }
+        }
+
+        async function copyPathValue() {
+            if (currentPathValue === undefined) return;
+            const payload = typeof currentPathValue === 'object'
+                ? JSON.stringify(currentPathValue, null, 2)
+                : String(currentPathValue);
+            try {
+                await navigator.clipboard.writeText(payload);
+                if (pathCopyButton) {
+                    if (pathCopyTimer) clearTimeout(pathCopyTimer);
+                    pathCopyButton.textContent = copiedLabel;
+                    pathCopyButton.classList.add('pulse');
+                    pathCopyTimer = setTimeout(() => {
+                        pathCopyButton.textContent = copyLabel;
+                        pathCopyButton.classList.remove('pulse');
+                    }, 1200);
+                }
+            } catch {
+                output.value = payload;
+                output.select();
+                document.execCommand('copy');
+                if (pathCopyButton) {
+                    if (pathCopyTimer) clearTimeout(pathCopyTimer);
+                    pathCopyButton.textContent = copiedLabel;
+                    pathCopyButton.classList.add('pulse');
+                    pathCopyTimer = setTimeout(() => {
+                        pathCopyButton.textContent = copyLabel;
+                        pathCopyButton.classList.remove('pulse');
+                    }, 1200);
+                }
+            }
+        }
+
+        function renderPathBar(path) {
+            pathBar.innerHTML = '';
+            const label = document.createElement('span');
+            label.className = 'path-label';
+            label.textContent = `{{ __('app.text_unescape.path_label') }}:`;
+
+            const crumbsWrap = document.createElement('div');
+            crumbsWrap.className = 'path-crumbs';
+            const crumbs = buildPathCrumbs(path);
+            crumbs.forEach((crumb, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'path-crumb';
+                if (index === crumbs.length - 1) {
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-current', 'location');
+                }
+                btn.textContent = crumb.label;
+                btn.addEventListener('click', () => focusPath(crumb.path));
+                crumbsWrap.appendChild(btn);
+                if (index < crumbs.length - 1) {
+                    const sep = document.createElement('span');
+                    sep.className = 'path-sep';
+                    sep.textContent = '>';
+                    crumbsWrap.appendChild(sep);
+                }
+            });
+
+            const meta = document.createElement('div');
+            meta.className = 'path-meta';
+            meta.appendChild(label);
+            meta.appendChild(crumbsWrap);
+
+            const actions = document.createElement('div');
+            actions.className = 'path-actions';
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'path-action';
+            copyBtn.textContent = `{{ __('app.text_unescape.copy_node') }}`;
+            copyBtn.addEventListener('click', copyPathValue);
+            pathCopyButton = copyBtn;
+            actions.appendChild(copyBtn);
+
+            pathBar.appendChild(meta);
+            pathBar.appendChild(actions);
+        }
+
+        function setPath(path, value) {
+            const normalized = path || 'root';
+            currentPath = normalized;
+            if (value !== undefined) {
+                currentPathValue = value;
+            } else {
+                currentPathValue = getNodeByPath(normalized);
+            }
+            renderPathBar(normalized);
+            highlightTreeNode(normalized);
+        }
 
         function tryJsonParse(raw) {
             try {
@@ -383,6 +581,8 @@
 
         function renderTree(value) {
             tree.innerHTML = '';
+            pathNodeMap = new Map();
+            activeNodeButton = null;
             const buildNode = (node, keyPath) => {
                 const li = document.createElement('li');
                 const isArray = Array.isArray(node);
@@ -414,12 +614,15 @@
                 }
 
                 const button = document.createElement('button');
+                button.className = 'node-button';
                 const valueMeta = formatValue(node);
                 button.innerHTML = `<span class="node-key">${keyLabel}</span><span class="node-type">${type}</span><span class="node-value ${valueMeta.type}">${valueMeta.text}</span>`;
-                button.dataset.path = keyPath || 'root';
+                const nodePath = keyPath || 'root';
+                button.dataset.path = nodePath;
+                pathNodeMap.set(nodePath, button);
                 button.addEventListener('click', () => {
                     if (currentView === 'tree') {
-                        pathBar.textContent = `{{ __('app.text_unescape.path_label') }}: ${button.dataset.path}`;
+                        setPath(nodePath, node);
                     }
                 });
                 row.appendChild(button);
@@ -440,7 +643,7 @@
             rootUl.appendChild(buildNode(value, ''));
             tree.appendChild(rootUl);
             if (currentView === 'tree') {
-                pathBar.textContent = `{{ __('app.text_unescape.path_label') }}: root`;
+                setPath('root', value);
             }
         }
 
