@@ -34,6 +34,7 @@
         <a href="/{{ $locale }}">← {{ __('app.nav.home') }}</a>
         <span class="badge">{{ __('app.csv_cleaner.title') }}</span>
     </div>
+    <h1 class="sr-only">{{ __('app.csv_cleaner.title') }}</h1>
     <div class="card tool-card workspace">
         <div class="toolbar focus-toolbar" style="margin-bottom: 16px;">
             <div class="group">

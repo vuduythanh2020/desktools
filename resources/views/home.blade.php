@@ -24,12 +24,18 @@
                 [
                     '@type' => 'ListItem',
                     'position' => 2,
+                    'name' => __('app.date_converter.title'),
+                    'url' => $baseUrl . '/' . $locale . '/date-converter',
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 3,
                     'name' => __('app.csv_cleaner.title'),
                     'url' => $baseUrl . '/' . $locale . '/csv-cleaner',
                 ],
                 [
                     '@type' => 'ListItem',
-                    'position' => 3,
+                    'position' => 4,
                     'name' => __('app.lucky_draw.title'),
                     'url' => $baseUrl . '/' . $locale . '/lucky-draw',
                 ],
@@ -47,6 +53,11 @@
                 <h3>{{ __('app.text_unescape.title') }}</h3>
                 <p class="muted">{{ __('app.text_unescape.summary') }}</p>
                 <a class="btn" href="/{{ $locale }}/text-unescape">{{ __('app.actions.open_tool') }}</a>
+            </div>
+            <div class="card">
+                <h3>{{ __('app.date_converter.title') }}</h3>
+                <p class="muted">{{ __('app.date_converter.summary') }}</p>
+                <a class="btn" href="/{{ $locale }}/date-converter">{{ __('app.actions.open_tool') }}</a>
             </div>
             <div class="card">
                 <h3>{{ __('app.csv_cleaner.title') }}</h3>

@@ -34,6 +34,7 @@
         <a href="/{{ $locale }}">← {{ __('app.nav.home') }}</a>
         <span class="badge">{{ __('app.lucky_draw.title') }}</span>
     </div>
+    <h1 class="sr-only">{{ __('app.lucky_draw.title') }}</h1>
     <div class="card tool-card workspace">
         <div class="toolbar" style="margin-bottom: 16px;">
             <div class="group">

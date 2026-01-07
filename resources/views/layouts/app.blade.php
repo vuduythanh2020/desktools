@@ -109,6 +109,17 @@
                 radial-gradient(900px 500px at 90% 10%, #f1eadf, transparent 55%),
                 var(--bg);
         }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
         .skip-link {
             position: absolute;
             left: -999px;
@@ -746,6 +757,7 @@
             <nav class="nav" aria-label="Primary">
                 <a href="/{{ $locale }}">{{ __('app.nav.home') }}</a>
                 <a href="/{{ $locale }}/text-unescape">{{ __('app.nav.text_unescape') }}</a>
+                <a href="/{{ $locale }}/date-converter">{{ __('app.nav.date_converter') }}</a>
                 <a href="/{{ $locale }}/csv-cleaner">{{ __('app.nav.csv_cleaner') }}</a>
                 <a href="/{{ $locale }}/lucky-draw">{{ __('app.nav.lucky_draw') }}</a>
             </nav>

@@ -21,7 +21,7 @@ Route::get('/robots.txt', function () {
 
 Route::get('/sitemap.xml', function () {
     $locales = ['vi', 'en'];
-    $paths = ['', 'text-unescape', 'csv-cleaner', 'lucky-draw'];
+    $paths = ['', 'text-unescape', 'csv-cleaner', 'lucky-draw', 'date-converter'];
     $urls = [];
     $base = rtrim(config('app.url') ?: url('/'), '/');
     if (str_starts_with($base, 'http://')) {
@@ -87,4 +87,10 @@ Route::prefix('{locale}')
                 'locale' => app()->getLocale(),
             ]);
         })->name('lucky-draw');
+
+        Route::get('/date-converter', function () {
+            return view('tools.date-converter', [
+                'locale' => app()->getLocale(),
+            ]);
+        })->name('date-converter');
     });
