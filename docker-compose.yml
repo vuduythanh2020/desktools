@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     volumes:
       - storage:/var/www/html/storage
+      - ./.env:/var/www/html/.env
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-proxy

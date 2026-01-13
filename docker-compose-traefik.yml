@@ -1,0 +1,29 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.email=talk@lexireel.com # đổi email
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --log.level=DEBUG
+      - --accesslog=true
+      - --api.insecure=true          # tạm để xem dashboard API (port 8080 nội bộ)
+
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    environment:
+      - DOCKER_API_VERSION=1.52
+    restart: unless-stopped
+    networks:
+      - traefik-proxy
+networks:
+  traefik-proxy:
+    external: true
